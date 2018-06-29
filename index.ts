@@ -9,6 +9,7 @@ const loggerlvl: LogLevel = ((process.env.NODE_ENV && process.env.NODE_ENV === '
 const log = LoggerImpl.createLogger({ name: 'config', level: loggerlvl, stream: process.stdout });
 
 const compareObjectConfig: IConfig = {
+  configchecked: false,
   configfile: '',
   lastreadAt: new Date()
 };
@@ -20,29 +21,36 @@ export class Config {
   /**
    * Tries to get config from cfgfile
    * @param cfgfile
+   * @param cfgSubkey
    */
-  static getInstance(cfgfile?: string): object | never {
+  static getInstance(cfgfile?: string, cfgSubkey?: string): object | never {
     const configfile = Config.generateConfigFilename(cfgfile);
-    return Config.getOrReadConfig<any>(configfile);
+    return Config.getOrReadConfig<any>(configfile, null, cfgSubkey);
   }
 
   /**
    * Tries to get config from cfgfile with checking properties to equal compareObject properties
    * @param compareObject
    * @param cfgfile
+   * @param cfgSubkey
    */
-  static getCheckedInstance<T extends IConfig>(compareObject: T, cfgfile?: string): T | never {
+  static getCheckedInstance<T extends IConfig>(compareObject: T, cfgfile?: string, cfgSubkey?: string): T | never {
     const configfile = Config.generateConfigFilename(cfgfile);
-    return Config.getOrReadConfig<T>(configfile, compareObject);
+    return Config.getOrReadConfig<T>(configfile, compareObject, cfgSubkey);
   }
 
   /**
    * Does the check to compare for existing properties
    * @param compareObject
    * @param cfg
+   * @param cfgSubkey
    */
-  protected static checkConfig<T extends IConfig>(compareObject: T, cfg: T): T | never {
-    const keys = Object.keys(cfg);
+  protected static checkConfig<T extends IConfig>(compareObject: T, cfg: T, cfgSubkey?: string): T | never {
+    const curcfg: IConfig = (cfgSubkey ? cfg[cfgSubkey] : cfg);
+    if (curcfg.configchecked) {
+      return cfg;
+    }
+    const keys = Object.keys(curcfg);
     const compKeys = Object.keys(compareObject).concat(Object.keys(compareObjectConfig));
     let failedKey: string;
     if (!keys.every((key) => {
@@ -54,6 +62,7 @@ export class Config {
     })) {
       throw new ConfigError('Configuration file check failed for \'%s\'', failedKey);
     }
+    curcfg.configchecked = true;
     return cfg;
   }
 
@@ -61,16 +70,20 @@ export class Config {
    * Reads config from file if not cached or file newer
    * @param filename
    * @param compareObject
+   * @param cfgSubkey
    */
-  protected static getOrReadConfig<T extends IConfig>(filename: string, compareObject?: T): T | never {
+  protected static getOrReadConfig<T extends IConfig>(filename: string, compareObject?: T, cfgSubkey?: string): T | never {
     if (Config.isFileNewer(filename)) {
       if (compareObject) {
-        return Config.setCache<T>(Config.checkConfig(compareObject, Config.readConfig<T>(filename)));
+        return Config.setCache<T>(Config.checkConfig(compareObject, Config.readConfig<T>(filename), cfgSubkey), cfgSubkey);
       } else {
-        return Config.setCache<T>(Config.readConfig<T>(filename));
+        return Config.setCache<T>(Config.readConfig<T>(filename), cfgSubkey);
       }
     }
-    return Config.getCache(filename);
+    if (compareObject) {
+      return Config.checkConfig(compareObject, Config.getCache<T>(filename, cfgSubkey));
+    }
+    return Config.getCache<T>(filename, cfgSubkey);
   }
 
   /**
@@ -147,18 +160,26 @@ export class Config {
   private static configCacheFileIndex: string[] = [];
   private static configCache: IConfig[] = [];
 
-  private static getCache<T extends IConfig>(filename: string): T | undefined {
-    return Config.configCache[Config.configCacheFileIndex.indexOf(filename)] as T;
+  private static getCache<T extends IConfig>(filename: string, cfgSubkey?: string): T | undefined {
+    const cfg = Config.configCache[Config.configCacheFileIndex.indexOf(filename)];
+    if (cfgSubkey) {
+      if (cfg[cfgSubkey]) {
+        cfg[cfgSubkey].lastreadAt = cfg.lastreadAt;
+        cfg[cfgSubkey].configfile = cfg.configfile;
+      }
+      return cfg[cfgSubkey] as T;
+    }
+    return cfg as T;
   }
 
-  private static setCache<T extends IConfig>(config: T): T {
+  private static setCache<T extends IConfig>(config: T, cfgSubkey?: string): T {
     const index = Config.configCacheFileIndex.indexOf(config.configfile);
     if (index !== -1) {
       Config.configCache[index] = config;
     } else {
       Config.configCacheFileIndex[Config.configCache.push(config) - 1] = config.configfile;
     }
-    return config;
+    return Config.getCache(config.configfile, cfgSubkey);
   }
 
   private constructor() { }

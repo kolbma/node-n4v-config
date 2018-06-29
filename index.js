@@ -6,6 +6,7 @@ var config_error_1 = require("./config_error");
 var loggerlvl = ((process.env.NODE_ENV && process.env.NODE_ENV === 'test') ? 'debug' : 'info');
 var log = LoggerImpl.createLogger({ name: 'config', level: loggerlvl, stream: process.stdout });
 var compareObjectConfig = {
+    configchecked: false,
     configfile: '',
     lastreadAt: new Date()
 };
@@ -18,27 +19,34 @@ var Config = /** @class */ (function () {
     /**
      * Tries to get config from cfgfile
      * @param cfgfile
+     * @param cfgSubkey
      */
-    Config.getInstance = function (cfgfile) {
+    Config.getInstance = function (cfgfile, cfgSubkey) {
         var configfile = Config.generateConfigFilename(cfgfile);
-        return Config.getOrReadConfig(configfile);
+        return Config.getOrReadConfig(configfile, null, cfgSubkey);
     };
     /**
      * Tries to get config from cfgfile with checking properties to equal compareObject properties
      * @param compareObject
      * @param cfgfile
+     * @param cfgSubkey
      */
-    Config.getCheckedInstance = function (compareObject, cfgfile) {
+    Config.getCheckedInstance = function (compareObject, cfgfile, cfgSubkey) {
         var configfile = Config.generateConfigFilename(cfgfile);
-        return Config.getOrReadConfig(configfile, compareObject);
+        return Config.getOrReadConfig(configfile, compareObject, cfgSubkey);
     };
     /**
      * Does the check to compare for existing properties
      * @param compareObject
      * @param cfg
+     * @param cfgSubkey
      */
-    Config.checkConfig = function (compareObject, cfg) {
-        var keys = Object.keys(cfg);
+    Config.checkConfig = function (compareObject, cfg, cfgSubkey) {
+        var curcfg = (cfgSubkey ? cfg[cfgSubkey] : cfg);
+        if (curcfg.configchecked) {
+            return cfg;
+        }
+        var keys = Object.keys(curcfg);
         var compKeys = Object.keys(compareObject).concat(Object.keys(compareObjectConfig));
         var failedKey;
         if (!keys.every(function (key) {
@@ -50,23 +58,28 @@ var Config = /** @class */ (function () {
         })) {
             throw new config_error_1.ConfigError('Configuration file check failed for \'%s\'', failedKey);
         }
+        curcfg.configchecked = true;
         return cfg;
     };
     /**
      * Reads config from file if not cached or file newer
      * @param filename
      * @param compareObject
+     * @param cfgSubkey
      */
-    Config.getOrReadConfig = function (filename, compareObject) {
+    Config.getOrReadConfig = function (filename, compareObject, cfgSubkey) {
         if (Config.isFileNewer(filename)) {
             if (compareObject) {
-                return Config.setCache(Config.checkConfig(compareObject, Config.readConfig(filename)));
+                return Config.setCache(Config.checkConfig(compareObject, Config.readConfig(filename), cfgSubkey), cfgSubkey);
             }
             else {
-                return Config.setCache(Config.readConfig(filename));
+                return Config.setCache(Config.readConfig(filename), cfgSubkey);
             }
         }
-        return Config.getCache(filename);
+        if (compareObject) {
+            return Config.checkConfig(compareObject, Config.getCache(filename, cfgSubkey));
+        }
+        return Config.getCache(filename, cfgSubkey);
     };
     /**
      * Does the read from filename and JSON parse
@@ -140,10 +153,18 @@ var Config = /** @class */ (function () {
         }
         return filemtime > cfg.lastreadAt.getTime();
     };
-    Config.getCache = function (filename) {
-        return Config.configCache[Config.configCacheFileIndex.indexOf(filename)];
+    Config.getCache = function (filename, cfgSubkey) {
+        var cfg = Config.configCache[Config.configCacheFileIndex.indexOf(filename)];
+        if (cfgSubkey) {
+            if (cfg[cfgSubkey]) {
+                cfg[cfgSubkey].lastreadAt = cfg.lastreadAt;
+                cfg[cfgSubkey].configfile = cfg.configfile;
+            }
+            return cfg[cfgSubkey];
+        }
+        return cfg;
     };
-    Config.setCache = function (config) {
+    Config.setCache = function (config, cfgSubkey) {
         var index = Config.configCacheFileIndex.indexOf(config.configfile);
         if (index !== -1) {
             Config.configCache[index] = config;
@@ -151,7 +172,7 @@ var Config = /** @class */ (function () {
         else {
             Config.configCacheFileIndex[Config.configCache.push(config) - 1] = config.configfile;
         }
-        return config;
+        return Config.getCache(config.configfile, cfgSubkey);
     };
     Config.configCacheFileIndex = [];
     Config.configCache = [];

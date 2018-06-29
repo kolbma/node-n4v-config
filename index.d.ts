@@ -6,26 +6,30 @@ export declare class Config {
     /**
      * Tries to get config from cfgfile
      * @param cfgfile
+     * @param cfgSubkey
      */
-    static getInstance(cfgfile?: string): object | never;
+    static getInstance(cfgfile?: string, cfgSubkey?: string): object | never;
     /**
      * Tries to get config from cfgfile with checking properties to equal compareObject properties
      * @param compareObject
      * @param cfgfile
+     * @param cfgSubkey
      */
-    static getCheckedInstance<T extends IConfig>(compareObject: T, cfgfile?: string): T | never;
+    static getCheckedInstance<T extends IConfig>(compareObject: T, cfgfile?: string, cfgSubkey?: string): T | never;
     /**
      * Does the check to compare for existing properties
      * @param compareObject
      * @param cfg
+     * @param cfgSubkey
      */
-    protected static checkConfig<T extends IConfig>(compareObject: T, cfg: T): T | never;
+    protected static checkConfig<T extends IConfig>(compareObject: T, cfg: T, cfgSubkey?: string): T | never;
     /**
      * Reads config from file if not cached or file newer
      * @param filename
      * @param compareObject
+     * @param cfgSubkey
      */
-    protected static getOrReadConfig<T extends IConfig>(filename: string, compareObject?: T): T | never;
+    protected static getOrReadConfig<T extends IConfig>(filename: string, compareObject?: T, cfgSubkey?: string): T | never;
     /**
      * Does the read from filename and JSON parse
      * @param filename
@@ -43,8 +47,8 @@ export declare class Config {
     protected static isFileNewer(filename: string): boolean;
     private static configCacheFileIndex;
     private static configCache;
-    private static getCache<T>(filename);
-    private static setCache<T>(config);
+    private static getCache<T>(filename, cfgSubkey?);
+    private static setCache<T>(config, cfgSubkey?);
     private constructor();
 }
 /**

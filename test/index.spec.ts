@@ -6,6 +6,7 @@ import { Config, ConfigError } from '../index';
 interface ITestConfig extends IConfig {
   property1: string;
   property2: object;
+  property3?: string;
 }
 
 describe('config', () => {
@@ -63,7 +64,8 @@ describe('config', () => {
   it('reads checked config file', () => {
     const compareObj: ITestConfig = {
       property1: 'test',
-      property2: {}
+      property2: {},
+      property3: ''
     };
     try {
       const cfg = Config.getCheckedInstance<ITestConfig>(compareObj, './test/test1.json');
@@ -78,7 +80,8 @@ describe('config', () => {
   it('gets checked cached config', () => {
     const compareObj: ITestConfig = {
       property1: 'test',
-      property2: {}
+      property2: {},
+      property3: ''
     };
     try {
       const cfg = Config.getCheckedInstance<ITestConfig>(compareObj, './test/test1.json');
@@ -96,7 +99,8 @@ describe('config', () => {
   it('fails config check', () => {
     const compareObj: ITestConfig = {
       property1: 'test',
-      property2: {}
+      property2: {},
+      property3: ''
     };
     try {
       const cfg = Config.getCheckedInstance<ITestConfig>(compareObj, './test/testfail.json');
