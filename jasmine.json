@@ -1,0 +1,16 @@
+{
+  "spec_dir": "test",
+  "spec_files": [
+    "**/*[sS]pec.ts"
+  ],
+  "helpers": [
+    "helpers/**/*.ts"
+  ],
+  "stopSpecOnExpectationFailure": false,
+  "random": false,
+  "reporters": [
+    {
+      "name": "jasmine-ts-console-reporter"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "name": "n4v-config",
+  "version": "0.0.1",
+  "description": "Caching JSON application configuration",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "prepublish": "npx tsc",
+    "release": "npx standard-version",
+    "test": "npx jasmine-ts --config=jasmine.json",
+    "test:coverage": "npx nyc -e .ts -x \"**/test/**/*.ts\" -x \"**/*.spec.ts\" jasmine-ts --config=jasmine.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kolbma/node-n4v-config.git"
+  },
+  "keywords": [
+    "n4v",
+    "net4VISIONS",
+    "typescript",
+    "config",
+    "json",
+    "cache",
+    "check"
+  ],
+  "author": {
+    "name": "Markus Kolb",
+    "email": "markus.kolb+node-n4v-config@n4v.eu"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kolbma/node-n4v-config/issues"
+  },
+  "homepage": "https://github.com/kolbma/node-n4v-config#readme",
+  "devDependencies": {
+    "@types/bunyan": "^1.8.4",
+    "@types/jasmine": "^2.8.8",
+    "@types/node": "^6.0.113",
+    "jasmine": "^3.1.0",
+    "jasmine-ts": "^0.2.1",
+    "jasmine-ts-console-reporter": "^3.1.1",
+    "nyc": "^11.7.3",
+    "standard-version": "^4.3.0",
+    "tslint": "^5.10.0",
+    "tslint-config-security": "^1.3.0",
+    "typescript": "^2.8.4"
+  },
+  "dependencies": {
+    "bunyan": "^1.8.12",
+    "n4v-app-error": "^0.0.1"
+  }
+}

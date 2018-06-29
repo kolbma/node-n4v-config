@@ -1,0 +1,6 @@
+{
+  "fail1": "test",
+  "fail2": {
+    "more": "test"
+  }
+}

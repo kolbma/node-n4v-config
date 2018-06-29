@@ -1,0 +1,23 @@
+{
+  "defaultSeverity": "warn",
+  "extends": [
+    "tslint:recommended",
+    "tslint-config-security"
+  ],
+  "jsRules": {},
+  "rules": {
+    "max-line-length": {
+      "options": [
+        140
+      ]
+    },
+    "member-access": false,
+    "quotemark": [
+      true,
+      "single"
+    ],
+    "space-before-function-paren": false,
+    "trailing-comma": false
+  },
+  "rulesDirectory": []
+}

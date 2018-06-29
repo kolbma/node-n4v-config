@@ -1,0 +1,6 @@
+{
+  "property1": "test",
+  "property2": {
+    "more": "test"
+  "garbled": {
+}
