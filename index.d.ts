@@ -47,8 +47,8 @@ export declare class Config {
     protected static isFileNewer(filename: string): boolean;
     private static configCacheFileIndex;
     private static configCache;
-    private static getCache<T>(filename, cfgSubkey?);
-    private static setCache<T>(config, cfgSubkey?);
+    private static getCache;
+    private static setCache;
     private constructor();
 }
 /**
