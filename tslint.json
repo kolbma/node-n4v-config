@@ -17,7 +17,8 @@
       "single"
     ],
     "space-before-function-paren": false,
-    "trailing-comma": false
+    "trailing-comma": false,
+    "tsr-detect-non-literal-fs-filename": false
   },
   "rulesDirectory": []
 }
