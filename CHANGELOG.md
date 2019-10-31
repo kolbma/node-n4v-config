@@ -1,6 +1,13 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [0.0.4](https://github.com/kolbma/node-n4v-config/compare/v0.0.3...v0.0.4) (2019-10-31)
+
+
+### Bug Fixes
+
+* updating deps for security ([71fa41a](https://github.com/kolbma/node-n4v-config/commit/71fa41ac126b71963bb9f4a47b7f4ae10864a164))
 
 ## [0.0.3](https://github.com/kolbma/node-n4v-config/compare/v0.0.2...v0.0.3) (2019-04-05)
 
