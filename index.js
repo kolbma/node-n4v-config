@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Config = void 0;
 var LoggerImpl = require("bunyan");
 var fs = require("fs");
 var config_error_1 = require("./config_error");
@@ -183,5 +184,5 @@ exports.Config = Config;
  * ConfigError is used if something goes wrong with configuration
  */
 var config_error_2 = require("./config_error");
-exports.ConfigError = config_error_2.ConfigError;
+Object.defineProperty(exports, "ConfigError", { enumerable: true, get: function () { return config_error_2.ConfigError; } });
 //# sourceMappingURL=index.js.map
